@@ -1,0 +1,26 @@
+{
+  "name": "spyglass",
+  "version": "1.0.0",
+  "description": "Steam market place scraper",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@azure/cosmos": "^4.1.1",
+    "axios": "^1.7.7",
+    "dotenv": "^16.4.5",
+    "playwright": "^1.48.1",
+    "sequelize": "^6.37.5",
+    "sequelize-cli": "^6.6.2",
+    "sqlite3": "^5.1.7",
+    "steam-totp": "^2.1.2",
+    "steam-tradeoffer-manager": "^2.11.5",
+    "steam-user": "^5.2.0",
+    "steamcommunity": "^3.48.3",
+    "tedious": "^18.6.1"
+  }
+}

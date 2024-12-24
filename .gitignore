@@ -1,3 +1,7 @@
+/browser_sessions/*
+*.sqlite
+/test/
+
 # Logs
 logs
 *.log
