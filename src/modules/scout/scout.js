@@ -9,8 +9,6 @@ const { CS2, TEAMFORTRESS2 } = require("../../config/appids")
 const { UAH } = require("../../config/currency")
 const { SCOUT_TARGET } = require("../../config/app.config")
 
-
-
 const item_list = []
 
 const APP_ID = TEAMFORTRESS2
@@ -23,60 +21,65 @@ async function scout() {
             steam_manager
         } = await Steam.init(null)
 
-        const items = await get_steam_items_without_median_sale_prices(CS2)
+        let has_more_items = true;
+        let processed_items = 0;
 
-        console.log(items)
-
-        notify("Items: " + items.length)
-
-        for (let item of items) {
-            try {
-                let import_obj
-                // const item = await get_steam_item_without_median_sale_prices(CS2)
-
-                const steam_item = await Steam.getItemInfo(steam_community, item.appid, item.market_hash_name, UAH)
+        while (has_more_items) {
+            const items = await get_steam_items_without_median_sale_prices({ limit: 10000 })
 
 
-                if (!steam_item) {
-                    await notify(`Steam item data is missing for ${item.market_hash_name}`)
-                    throw new Error(`Steam item data is missing for ${item.market_hash_name}`);
-                }
+            console.log(`Retrieved ${items.length} items from the database.`);
+            notify(`Items fetched: ${items.length}`);
 
-                import_obj = {
-                    ...item,
-                    median_sale_prices: steam_item.medianSalePrices || [],
-                    quantity: steam_item.quantity || null,
-                    lowest_price: steam_item.lowestPrice || null,
-                    buy_quantity: steam_item.buyQuantity || null,
-                    highest_buy_order: steam_item.highestBuyOrder || null,
-                    detailes: {
-                        ...item.detailes,
-                        icon_url_large: steam_item?.firstAsset?.icon_url_large || null
+            if (items.length === 0) {
+                has_more_items = false; 
+                break;
+            }
+
+            for (let item of items) {
+                try {
+                    const steam_item = await Steam.getItemInfo(steam_community, item.appid, item.market_hash_name, UAH);
+
+                    if (!steam_item) {
+                        await notify(`Steam item data is missing for ${item.market_hash_name}`);
+                        console.warn(`Steam item data is missing for ${item.market_hash_name}`);
+                        continue; // Пропускаємо цей елемент
                     }
+
+                    const import_obj = {
+                        ...item,
+                        median_sale_prices: steam_item.medianSalePrices || [],
+                        quantity: steam_item.quantity || null,
+                        lowest_price: steam_item.lowestPrice || null,
+                        buy_quantity: steam_item.buyQuantity || null,
+                        highest_buy_order: steam_item.highestBuyOrder || null,
+                        detailes: {
+                            ...item.detailes,
+                            icon_url_large: steam_item?.firstAsset?.icon_url_large || null
+                        }
+                    };
+
+                    console.log(`Processed item: ${item.market_hash_name}`);
+                    await upsert_steam_item(import_obj);
+
+                    processed_items++;
+                    await sleep(10000);
+                } catch (error) {
+                    console.error(`Error processing item ${item.market_hash_name}:`, error.message);
+                    notify(`ERROR | WHILE PROCESSING ITEM: ${error.message}`);
                 }
+            }
 
-                console.log(import_obj)
-
-                await upsert_steam_item(import_obj)
-
-                // fs.writeFileSync("test.json", JSON.stringify(steam_item))
-                // fs.writeFileSync("test11.json", JSON.stringify(item))
-
-                await sleep(10000)
-            } catch (error) {
-                notify("ERROR | WHILE SCOUT: " + error.message)
+            if (items.length < 1000) {
+                has_more_items = false;
             }
         }
 
-        notify("SCOUT | Complete")
-        // while (true) {
-
-        // }
-
-
+        console.log(`SCOUT Complete. Total processed items: ${processedItems}`);
+        notify(`SCOUT | Complete. Total processed items: ${processedItems}`);
     } catch (error) {
-        console.log(error)
-        notify("SCOUT | " + error.message)
+        console.error(`SCOUT Error:`, error.message);
+        notify(`SCOUT | ${error.message}`);
     }
 }
 
