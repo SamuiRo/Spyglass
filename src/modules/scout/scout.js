@@ -7,7 +7,7 @@ const { sleep } = require("../../shared/utilis")
 const { get_steam_item_without_median_sale_prices, get_steam_items_without_median_sale_prices, upsert_steam_item } = require("../teapot/cosmos/steamitem_service/index")
 const { CS2, TEAMFORTRESS2 } = require("../../config/appids")
 const { UAH } = require("../../config/currency")
-const { SCOUT_TARGET} = require("../../config/app.config")
+const { SCOUT_TARGET } = require("../../config/app.config")
 
 
 
@@ -26,6 +26,8 @@ async function scout() {
         const items = await get_steam_items_without_median_sale_prices(CS2)
 
         console.log(items)
+
+        notify("Items: " + items.length)
 
         for (let item of items) {
             try {
@@ -65,6 +67,8 @@ async function scout() {
                 notify("ERROR | WHILE SCOUT: " + error.message)
             }
         }
+
+        notify("SCOUT | Complete")
         // while (true) {
 
         // }
@@ -72,6 +76,7 @@ async function scout() {
 
     } catch (error) {
         console.log(error)
+        notify("SCOUT | " + error.message)
     }
 }
 

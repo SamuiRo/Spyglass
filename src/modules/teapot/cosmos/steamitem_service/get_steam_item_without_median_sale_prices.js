@@ -39,7 +39,7 @@ async function get_steam_items_without_median_sale_prices(appid) {
         // Запит для отримання до 1000 записів без поля "median_sale_prices" із фільтром за appid
         const querySpec = {
             query: `
-                SELECT TOP 1000 * 
+                SELECT TOP 10000 * 
                 FROM c 
                 WHERE NOT IS_DEFINED(c.median_sale_prices) 
                 ${appid ? "AND c.appid = @appid" : ""}
