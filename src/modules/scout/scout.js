@@ -25,7 +25,7 @@ async function scout() {
         let processed_items = 0;
 
         while (has_more_items) {
-            const items = await get_steam_items_without_median_sale_prices({ limit: 10000 })
+            const items = await get_steam_items_without_median_sale_prices({ limit: 1000 })
 
 
             console.log(`Retrieved ${items.length} items from the database.`);
