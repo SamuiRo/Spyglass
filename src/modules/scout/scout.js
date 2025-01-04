@@ -32,7 +32,7 @@ async function scout() {
             notify(`Items fetched: ${items.length}`);
 
             if (items.length === 0) {
-                has_more_items = false; 
+                has_more_items = false;
                 break;
             }
 
@@ -63,11 +63,15 @@ async function scout() {
                     await upsert_steam_item(import_obj);
 
                     processed_items++;
-                    await sleep(10000);
                 } catch (error) {
                     console.error(`Error processing item ${item.market_hash_name}:`, error.message);
                     notify(`ERROR | WHILE PROCESSING ITEM: ${error.message}`);
-                }
+                    if (error.message.includes("HTTP error 429")) {
+                        notify(`Sleeping for 2 hours...`);
+                        console.log("Sleeping for 2 hours...");
+                        await sleep(7200000);
+                    }
+                } finally { await sleep(10000); }
             }
 
             if (items.length < 1000) {
