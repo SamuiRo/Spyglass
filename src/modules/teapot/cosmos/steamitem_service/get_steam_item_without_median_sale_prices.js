@@ -86,7 +86,7 @@ async function get_steam_items_without_median_sale_prices({ appid = null, limit 
             parameters
         };
 
-        if (hasListings !== null) {
+        if (has_listings !== null) {
             queryParts.push(has_listings ? `AND IS_DEFINED(c.listings) AND c.listings > 0`
                 : `AND (NOT IS_DEFINED(c.listings) OR c.listings = 0)`);
         }
