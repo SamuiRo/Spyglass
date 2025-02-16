@@ -64,6 +64,18 @@ async function scout() {
 
                     processed_items++;
                 } catch (error) {
+                    const import_obj = {
+                        ...item,
+                        listings: 0,
+                        detailes: {
+                            ...item.detailes,
+                            
+                        }
+                    };
+
+                    console.log(`Processed NO listings item: ${item.market_hash_name}`);
+                    await upsert_steam_item(import_obj);
+                    
                     console.error(`Error processing item ${item.market_hash_name}:`, error.message);
                     notify(`ERROR | WHILE PROCESSING ITEM: ${error.message}`);
                     if (error.message.includes("HTTP error 429")) {

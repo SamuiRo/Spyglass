@@ -63,7 +63,7 @@ async function get_steam_item_without_median_sale_prices(appid) {
 //     }
 // }
 
-async function get_steam_items_without_median_sale_prices({ appid = null, limit = 1000 }) {
+async function get_steam_items_without_median_sale_prices({ appid = null, limit = 1000, has_listings = null }) {
     const container = client.database(database_id).container(container_id);
 
     try {
@@ -85,6 +85,11 @@ async function get_steam_items_without_median_sale_prices({ appid = null, limit 
             query: queryParts.join(' '),
             parameters
         };
+
+        if (hasListings !== null) {
+            queryParts.push(has_listings ? `AND IS_DEFINED(c.listings) AND c.listings > 0`
+                : `AND (NOT IS_DEFINED(c.listings) OR c.listings = 0)`);
+        }
 
         // Виконуємо запит і отримуємо результати
         const { resources: items } = await container.items.query(querySpec).fetchAll();
